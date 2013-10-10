@@ -24,3 +24,8 @@ developed by [Dan Bernstein](http://cr.yp.to/djb.html), for fast Diffie-Hellman 
 	byte[] bobShared = Curve25519.GetSharedSecret(bobPrivate, alicePublic);
 	
 	// aliceShared == bobShared
+
+#### NuGet Package
+
+...can be downloaded from here:  
+https://www.nuget.org/packages/Curve25519/
