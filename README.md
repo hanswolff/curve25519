@@ -7,7 +7,7 @@ developed by [Dan Bernstein](http://cr.yp.to/djb.html), for fast Diffie-Hellman 
 	byte[] aliceRandomBytes = new byte[32];
 	RNGCryptoServiceProvider.Create().GetBytes(aliceRandomBytes);
 
-	byte[] alicePrivate = Curve25519.ClampPrivateKey(someRandomBytes);
+	byte[] alicePrivate = Curve25519.ClampPrivateKey(aliceRandomBytes);
 	byte[] alicePublic = Curve25519.GetPublicKey(alicePrivate);
 
 	// what Bob does
