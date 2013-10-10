@@ -1,4 +1,4 @@
-[Curve25519](http://ed25519.cr.yp.to/) is an elliptic curve, 
+[Curve25519](http://cr.yp.to/ecdh.html) is an elliptic curve, 
 developed by [Dan Bernstein](http://cr.yp.to/djb.html), for fast Diffie-Hellman key agreement.
 
 #### Usage Example
