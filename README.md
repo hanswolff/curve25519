@@ -46,4 +46,4 @@ You cannot sign and verify messages with the implementation above. If you need
 an ECDSA you can use **Ed25519**.
 
 A good port of **Ed25519** can be found here:  
-https://https//github.com/CodesInChaos/Chaos.NaCl
+https://github.com/CodesInChaos/Chaos.NaCl
