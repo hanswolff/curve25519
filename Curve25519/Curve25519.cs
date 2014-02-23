@@ -91,7 +91,19 @@ namespace Elliptic
         /// <remarks>WARNING: if signingKey is not NULL, this function has data-dependent timing</remarks>
         public static void KeyGenInline(byte[] publicKey, byte[] signingKey, byte[] privateKey)
         {
+            if (publicKey == null) throw new ArgumentNullException("publicKey");
+            if (publicKey.Length != 32) throw new ArgumentException(String.Format("publicKey must be 32 bytes long (but was {0} bytes long)", publicKey.Length), "publicKey");
+
+            if (signingKey == null) throw new ArgumentNullException("signingKey");
+            if (signingKey.Length != 32) throw new ArgumentException(String.Format("signingKey must be 32 bytes long (but was {0} bytes long)", signingKey.Length), "signingKey");
+
+            if (privateKey == null) throw new ArgumentNullException("privateKey");
+            if (privateKey.Length != 32) throw new ArgumentException(String.Format("privateKey must be 32 bytes long (but was {0} bytes long)", privateKey.Length), "privateKey");
+
+            RNGCryptoServiceProvider.Create().GetBytes(privateKey);
             ClampPrivateKeyInline(privateKey);
+
+            Core(publicKey, signingKey, CreateRandomPrivateKey(), null); // timing attack countermeasure
             Core(publicKey, signingKey, privateKey, null);
         }
 
