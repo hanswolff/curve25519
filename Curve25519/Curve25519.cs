@@ -12,6 +12,7 @@
  */
 
 using System;
+using System.Security.Cryptography;
 
 namespace Elliptic
 {
@@ -69,6 +70,19 @@ namespace Elliptic
         }
 
         /// <summary>
+        /// Creates a random private key
+        /// </summary>
+        /// <returns>32 random bytes that are clamped to a suitable private key</returns>
+        public static byte[] CreateRandomPrivateKey()
+        {
+            var privateKey = new byte[32];
+            RNGCryptoServiceProvider.Create().GetBytes(privateKey);
+            ClampPrivateKeyInline(privateKey);
+
+            return privateKey;
+        }
+
+        /// <summary>
         /// Key-pair generation (inline, for performance)
         /// </summary>
         /// <param name="publicKey">[out] public key</param>
@@ -88,6 +102,8 @@ namespace Elliptic
         public static byte[] GetPublicKey(byte[] privateKey)
         {
             var publicKey = new byte[32];
+
+            Core(publicKey, null, CreateRandomPrivateKey(), null); // timing attack countermeasure
             Core(publicKey, null, privateKey, null);
             return publicKey;
         }
@@ -100,6 +116,8 @@ namespace Elliptic
         {
             var signingKey = new byte[32];
             var publicKey = new byte[32];
+
+            Core(publicKey, signingKey, CreateRandomPrivateKey(), null); // timing attack countermeasure
             Core(publicKey, signingKey, privateKey, null);
             return signingKey;
         }
@@ -113,6 +131,8 @@ namespace Elliptic
         public static byte[] GetSharedSecret(byte[] privateKey, byte[] peerPublicKey)
         {
             var sharedSecret = new byte[32];
+
+            Core(sharedSecret, null, CreateRandomPrivateKey(), peerPublicKey); // timing attack countermeasure
             Core(sharedSecret, null, privateKey, peerPublicKey);
             return sharedSecret;
         }
