@@ -725,7 +725,7 @@ namespace Elliptic
         /// <param name="x">must be reduced input</param>
         static int IsNegative(Long10 x)
         {
-            return (int)(((IsOverflow(x) || (x.N9 < 0)) ? 1 : 0) ^ (x.N0 & 1));
+            return (int)(((IsOverflow(x) | (x.N9 < 0)) ? 1 : 0) ^ (x.N0 & 1));
         }
 
         /********************* Elliptic curve *********************/
@@ -831,10 +831,6 @@ namespace Elliptic
 
             for (int i = 32; i-- != 0; )
             {
-                if (i == 0)
-                {
-                    i = 0;
-                }
                 for (int j = 8; j-- != 0; )
                 {
                     /* swap arguments depending on bit */
