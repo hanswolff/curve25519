@@ -19,6 +19,9 @@ namespace Elliptic.Tests
                 byte[] bobPrivate = Curve25519.ClampPrivateKey(TestHelpers.GetRandomBytes(random, 32));
                 byte[] bobPublic = Curve25519.GetPublicKey(bobPrivate);
 
+                Assert.AreNotEqual(alicePrivate, bobPrivate);
+                Assert.AreNotEqual(alicePublic, bobPublic);
+
                 byte[] aliceShared = Curve25519.GetSharedSecret(alicePrivate, bobPublic);
                 byte[] bobShared = Curve25519.GetSharedSecret(bobPrivate, alicePublic);
 
@@ -43,7 +46,7 @@ namespace Elliptic.Tests
                 byte[] alicePublicWithBitToggled = TestHelpers.ToggleBitInKey(alicePublic, random);
                 byte[] bobShared = Curve25519.GetSharedSecret(bobPrivate, alicePublicWithBitToggled);
 
-                Assert.AreNotEqual(aliceShared, bobShared);
+                Assert.AreNotEqual(aliceShared, bobShared, "Failed iteration " + i);
             }
         }
     }
