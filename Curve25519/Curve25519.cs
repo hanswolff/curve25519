@@ -103,7 +103,6 @@ namespace Elliptic
             RNGCryptoServiceProvider.Create().GetBytes(privateKey);
             ClampPrivateKeyInline(privateKey);
 
-            Core(publicKey, signingKey, CreateRandomPrivateKey(), null); // timing attack countermeasure
             Core(publicKey, signingKey, privateKey, null);
         }
 
@@ -115,7 +114,6 @@ namespace Elliptic
         {
             var publicKey = new byte[32];
 
-            Core(publicKey, null, CreateRandomPrivateKey(), null); // timing attack countermeasure
             Core(publicKey, null, privateKey, null);
             return publicKey;
         }
@@ -129,7 +127,6 @@ namespace Elliptic
             var signingKey = new byte[32];
             var publicKey = new byte[32];
 
-            Core(publicKey, signingKey, CreateRandomPrivateKey(), null); // timing attack countermeasure
             Core(publicKey, signingKey, privateKey, null);
             return signingKey;
         }
@@ -144,7 +141,6 @@ namespace Elliptic
         {
             var sharedSecret = new byte[32];
 
-            Core(sharedSecret, null, CreateRandomPrivateKey(), peerPublicKey); // timing attack countermeasure
             Core(sharedSecret, null, privateKey, peerPublicKey);
             return sharedSecret;
         }
