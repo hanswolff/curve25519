@@ -331,8 +331,8 @@ namespace Elliptic
         static bool IsOverflow(Long10 x)
         {
             return (
-                ((x.N0 > P26 - 19)) &&
-                ((x.N1 & x.N3 & x.N5 & x.N7 & x.N9) == P25) &&
+                ((x.N0 > P26 - 19)) &
+                ((x.N1 & x.N3 & x.N5 & x.N7 & x.N9) == P25) &
                 ((x.N2 & x.N4 & x.N6 & x.N8) == P26)
                 ) || (x.N9 > P25);
         }
