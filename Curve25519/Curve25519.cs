@@ -340,7 +340,7 @@ namespace Elliptic
             fproduct(t.Items, input, in2);
             freduce_degree(t.Items);
             freduce_coefficients(t.Items);
-            memcpy10(output, t.Items);
+            memcpy(output, t.Items, 10);
         }
 
         private static void fsquare_inner(limb* output, limb* input)
@@ -413,7 +413,7 @@ namespace Elliptic
             fsquare_inner(t.Items, input);
             freduce_degree(t.Items);
             freduce_coefficients(t.Items);
-            memcpy10(output, t.Items);
+            memcpy(output, t.Items, 10);
         }
 
         private static int ReadLittleEndianInt32(byte* p)
@@ -593,11 +593,11 @@ namespace Elliptic
             var zzzprime = new Long19();
             var xxxprime = new Long19();
 
-            memcpy10(origx.Items, x);
+            memcpy(origx.Items, x, 10);
             fsum(x, z);
             fdifference(z, origx.Items); // does x - z
 
-            memcpy10(origxprime.Items, xprime);
+            memcpy(origxprime.Items, xprime, 10);
             fsum(xprime, zprime);
             fdifference(zprime, origxprime.Items);
             fproduct(xxprime.Items, xprime, z);
@@ -606,7 +606,7 @@ namespace Elliptic
             freduce_coefficients(xxprime.Items);
             freduce_degree(zzprime.Items);
             freduce_coefficients(zzprime.Items);
-            memcpy10(origxprime.Items, xxprime.Items);
+            memcpy(origxprime.Items, xxprime.Items, 10);
             fsum(xxprime.Items, zzprime.Items);
             fdifference(zzprime.Items, origxprime.Items);
             fsquare(xxxprime.Items, xxprime.Items);
@@ -614,8 +614,8 @@ namespace Elliptic
             fproduct(zzprime.Items, zzzprime.Items, qmqp);
             freduce_degree(zzprime.Items);
             freduce_coefficients(zzprime.Items);
-            memcpy10(x3, xxxprime.Items);
-            memcpy10(z3, zzprime.Items);
+            memcpy(x3, xxxprime.Items, 10);
+            memcpy(z3, zzprime.Items, 10);
 
             fsquare(xx.Items, x);
             fsquare(zz.Items, z);
@@ -633,10 +633,19 @@ namespace Elliptic
             freduce_coefficients(z2);
         }
 
-        private static void memcpy10(limb* destination, limb* source)
+        private static void memcpy(byte* destination, byte* source, int size)
         {
             //ToDo: optimize
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < size; i++)
+            {
+                destination[i] = source[i];
+            }
+        }
+
+        private static void memcpy(limb* destination, limb* source, int size)
+        {
+            //ToDo: optimize
+            for (int i = 0; i < size; i++)
             {
                 destination[i] = source[i];
             }
@@ -696,7 +705,7 @@ namespace Elliptic
                 nqx2 = g.Items,
                 nqz2 = h.Items;
 
-            memcpy10(nqpqx, q);
+            memcpy(nqpqx, q, 10);
 
             for (int i = 0; i < 32; ++i)
             {
@@ -732,8 +741,8 @@ namespace Elliptic
                 }
             }
 
-            memcpy10(resultx, nqx);
-            memcpy10(resultz, nqz);
+            memcpy(resultx, nqx, 10);
+            memcpy(resultz, nqz, 10);
         }
 
         // -----------------------------------------------------------------------------
