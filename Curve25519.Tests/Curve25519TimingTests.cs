@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
 namespace Elliptic.Tests
 {
@@ -12,26 +11,30 @@ namespace Elliptic.Tests
         [Test]
         public void Curve25519_GetPublicKey()
         {
-            var millis = new List<long>();
+            List<long> ticks = new List<long>();
             for (int i = 0; i < 255; i++)
             {
-                byte[] privateKey = Curve25519.ClampPrivateKey(TestHelpers.GetUniformBytes((byte)i, 32));
-                Curve25519.GetPublicKey(privateKey);
-
                 Stopwatch stopwatch = Stopwatch.StartNew();
 
-                for (int j = 0; j < 100; j++)
+                byte[] privateKey = Curve25519.ClampPrivateKey(TestHelpers.GetUniformBytes((byte)i, 32));
+
+                for (int j = 0; j < 1000; j++)
                 {
-                    Curve25519.GetPublicKey(privateKey);
+                    byte[] publicKey = Curve25519.GetPublicKey(privateKey);
                 }
 
-                millis.Add(stopwatch.ElapsedMilliseconds);
+                ticks.Add(stopwatch.ElapsedMilliseconds);
             }
 
-            var text = new StringBuilder();
-            foreach (var ms in millis)
-                text.Append(ms + ",");
-            Assert.Inconclusive(text.ToString());
+            long min = long.MaxValue;
+            long max = long.MinValue;
+            for (int i = 0; i < ticks.Count; i++)
+            {
+                if (ticks[i] < min) min = ticks[i];
+                if (ticks[i] > max) max = ticks[i];
+            }
+
+            Assert.Inconclusive("Min: {0}, Max: {1}", min, max);
         }
     }
 }
