@@ -11,7 +11,7 @@ C implementation based on generic 64-bit integer implementation of Curve25519 EC
 Written by Matthijs van Duin, 200608242056  
 Original: http://cds.xs4all.nl:8081/ecdh/ (broken link)
 
-*Warning! This implementation is susceptible to timing attacks!*
+**Warning! This implementation is susceptible to timing attacks!**
 
 #### Usage Example
 
