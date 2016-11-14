@@ -108,10 +108,14 @@ namespace Elliptic
 
         static void GetRandomBytes(byte[] bytes)
         {
+#if NET20
+            RandomNumberGenerator.Create().GetBytes(bytes);
+#else
             using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(bytes);
             }
+#endif
         }
 
         /// <summary>
