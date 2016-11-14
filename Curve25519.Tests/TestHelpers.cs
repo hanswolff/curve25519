@@ -33,13 +33,13 @@ namespace Elliptic.Tests
 
         public static byte[] ToggleBitInKey(byte[] buffer, Random random)
         {
-            var bitArray = new BitArray(buffer);
             var bitToToggle = random.Next(buffer.Length*8);
-            var bit = bitArray.Get(bitToToggle);
-            bitArray.Set(bitToToggle, !bit);
 
             var result = new byte[buffer.Length];
-            bitArray.CopyTo(result, 0);
+
+            buffer.CopyTo(result, 0);
+            result[bitToToggle / 8] ^= (byte)(1 << bitToToggle % 8);
+
             return result;
         }
     }

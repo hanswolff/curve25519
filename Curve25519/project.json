@@ -1,0 +1,13 @@
+{
+  "supports": {},
+  "frameworks": {
+    "netstandard1.3": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.0"
+      }
+    }
+  },
+  "dependencies": {
+    "System.Security.Cryptography.Algorithms": "4.2.0"
+  }
+}

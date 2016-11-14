@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2012
 VisualStudioVersion = 12.0.20623.1 VSUPREVIEW
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Curve25519", "Curve25519\Curve25519.csproj", "{8501804F-2C32-4F80-9478-237F0ACC96FD}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Curve25519", "Curve25519\Curve25519.xproj", "{8501804F-2C32-4F80-9478-237F0ACC96FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Curve25519.Tests", "Curve25519.Tests\Curve25519.Tests.csproj", "{03F53FD2-F744-4BCB-9742-71B8BA3EB3C8}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Curve25519.Tests", "Curve25519.Tests\Curve25519.Tests.xproj", "{03F53FD2-F744-4BCB-9742-71B8BA3EB3C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
