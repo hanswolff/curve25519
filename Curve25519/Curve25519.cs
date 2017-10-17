@@ -1,4 +1,5 @@
 ﻿/* Ported parts from Java to C# and refactored by Hans Wolff, 17/09/2013 */
+/* Ported to .NET Framework 4.7, .NET Standard and refactored by Felipe Muniz, 17/10/2017 */
 
 /* Ported from C to Java by Dmitry Skiba [sahn0], 23/02/08.
  * Original: http://code.google.com/p/curve25519-java/
@@ -14,7 +15,7 @@
 using System;
 using System.Security.Cryptography;
 
-namespace Elliptic
+namespace Curve25519
 {
     public class Curve25519
     {
@@ -333,10 +334,10 @@ namespace Elliptic
         private static bool IsOverflow(Long10 x)
         {
             return (
-                ((x.N0 > P26 - 19)) &
-                ((x.N1 & x.N3 & x.N5 & x.N7 & x.N9) == P25) &
-                ((x.N2 & x.N4 & x.N6 & x.N8) == P26)
-                ) || (x.N9 > P25);
+                       ((x.N0 > P26 - 19)) &
+                       ((x.N1 & x.N3 & x.N5 & x.N7 & x.N9) == P25) &
+                       ((x.N2 & x.N4 & x.N6 & x.N8) == P26)
+                   ) || (x.N9 > P25);
         }
 
         /* Convert from internal format to little-endian byte format.  The 
@@ -520,10 +521,10 @@ namespace Elliptic
                 y8 = y.N8,
                 y9 = y.N9;
             var
-                t = (x0*y8) + (x2*y6) + (x4*y4) + (x6*y2) +
-                    (x8*y0) + 2*((x1*y7) + (x3*y5) +
-                                 (x5*y3) + (x7*y1)) + 38*
-                    (x9*y9);
+                t = (x0 * y8) + (x2 * y6) + (x4 * y4) + (x6 * y2) +
+                    (x8 * y0) + 2 * ((x1 * y7) + (x3 * y5) +
+                                     (x5 * y3) + (x7 * y1)) + 38 *
+                    (x9 * y9);
             xy.N8 = (t & ((1 << 26) - 1));
             t = (t >> 26) + (x0 * y9) + (x1 * y8) + (x2 * y7) +
                 (x3 * y6) + (x4 * y5) + (x5 * y4) +
@@ -531,28 +532,28 @@ namespace Elliptic
                 (x9 * y0);
             xy.N9 = (t & ((1 << 25) - 1));
             t = (x0 * y0) + 19 * ((t >> 25) + (x2 * y8) + (x4 * y6)
-                                + (x6 * y4) + (x8 * y2)) + 38 *
+                                  + (x6 * y4) + (x8 * y2)) + 38 *
                 ((x1 * y9) + (x3 * y7) + (x5 * y5) +
                  (x7 * y3) + (x9 * y1));
             xy.N0 = (t & ((1 << 26) - 1));
             t = (t >> 26) + (x0 * y1) + (x1 * y0) + 19 * ((x2 * y9)
-                                                        + (x3 * y8) + (x4 * y7) + (x5 * y6) +
-                                                        (x6 * y5) + (x7 * y4) + (x8 * y3) +
-                                                        (x9 * y2));
+                                                          + (x3 * y8) + (x4 * y7) + (x5 * y6) +
+                                                          (x6 * y5) + (x7 * y4) + (x8 * y3) +
+                                                          (x9 * y2));
             xy.N1 = (t & ((1 << 25) - 1));
             t = (t >> 25) + (x0 * y2) + (x2 * y0) + 19 * ((x4 * y8)
-                                                        + (x6 * y6) + (x8 * y4)) + 2 * (x1 * y1)
+                                                          + (x6 * y6) + (x8 * y4)) + 2 * (x1 * y1)
                 + 38 * ((x3 * y9) + (x5 * y7) +
-                      (x7 * y5) + (x9 * y3));
+                        (x7 * y5) + (x9 * y3));
             xy.N2 = (t & ((1 << 26) - 1));
             t = (t >> 26) + (x0 * y3) + (x1 * y2) + (x2 * y1) +
                 (x3 * y0) + 19 * ((x4 * y9) + (x5 * y8) +
-                                (x6 * y7) + (x7 * y6) +
-                                (x8 * y5) + (x9 * y4));
+                                  (x6 * y7) + (x7 * y6) +
+                                  (x8 * y5) + (x9 * y4));
             xy.N3 = (t & ((1 << 25) - 1));
             t = (t >> 25) + (x0 * y4) + (x2 * y2) + (x4 * y0) + 19 *
                 ((x6 * y8) + (x8 * y6)) + 2 * ((x1 * y3) +
-                                             (x3 * y1)) + 38 *
+                                               (x3 * y1)) + 38 *
                 ((x5 * y9) + (x7 * y7) + (x9 * y5));
             xy.N4 = (t & ((1 << 26) - 1));
             t = (t >> 26) + (x0 * y5) + (x1 * y4) + (x2 * y3) +
@@ -562,13 +563,13 @@ namespace Elliptic
             xy.N5 = (t & ((1 << 25) - 1));
             t = (t >> 25) + (x0 * y6) + (x2 * y4) + (x4 * y2) +
                 (x6 * y0) + 19 * (x8 * y8) + 2 * ((x1 * y5) +
-                                              (x3 * y3) + (x5 * y1)) + 38 *
+                                                  (x3 * y3) + (x5 * y1)) + 38 *
                 ((x7 * y9) + (x9 * y7));
             xy.N6 = (t & ((1 << 26) - 1));
             t = (t >> 26) + (x0 * y7) + (x1 * y6) + (x2 * y5) +
                 (x3 * y4) + (x4 * y3) + (x5 * y2) +
                 (x6 * y1) + (x7 * y0) + 19 * ((x8 * y9) +
-                                            (x9 * y8));
+                                              (x9 * y8));
             xy.N7 = (t & ((1 << 25) - 1));
             t = (t >> 25) + xy.N8;
             xy.N8 = (t & ((1 << 26) - 1));
@@ -593,21 +594,21 @@ namespace Elliptic
                 x9 = x.N9;
 
             var t = (x4 * x4) + 2 * ((x0 * x8) + (x2 * x6)) + 38 *
-                     (x9 * x9) + 4 * ((x1 * x7) + (x3 * x5));
+                    (x9 * x9) + 4 * ((x1 * x7) + (x3 * x5));
 
             xsqr.N8 = (t & ((1 << 26) - 1));
             t = (t >> 26) + 2 * ((x0 * x9) + (x1 * x8) + (x2 * x7) +
-                               (x3 * x6) + (x4 * x5));
+                                 (x3 * x6) + (x4 * x5));
             xsqr.N9 = (t & ((1 << 25) - 1));
             t = 19 * (t >> 25) + (x0 * x0) + 38 * ((x2 * x8) +
-                                               (x4 * x6) + (x5 * x5)) + 76 * ((x1 * x9)
-                                                                            + (x3 * x7));
+                                                   (x4 * x6) + (x5 * x5)) + 76 * ((x1 * x9)
+                                                                                  + (x3 * x7));
             xsqr.N0 = (t & ((1 << 26) - 1));
             t = (t >> 26) + 2 * (x0 * x1) + 38 * ((x2 * x9) +
-                                              (x3 * x8) + (x4 * x7) + (x5 * x6));
+                                                  (x3 * x8) + (x4 * x7) + (x5 * x6));
             xsqr.N1 = (t & ((1 << 25) - 1));
             t = (t >> 25) + 19 * (x6 * x6) + 2 * ((x0 * x2) +
-                                              (x1 * x1)) + 38 * (x4 * x8) + 76 *
+                                                  (x1 * x1)) + 38 * (x4 * x8) + 76 *
                 ((x3 * x9) + (x5 * x7));
             xsqr.N2 = (t & ((1 << 26) - 1));
             t = (t >> 26) + 2 * ((x0 * x3) + (x1 * x2)) + 38 *
@@ -621,11 +622,11 @@ namespace Elliptic
                 + 38 * ((x6 * x9) + (x7 * x8));
             xsqr.N5 = (t & ((1 << 25) - 1));
             t = (t >> 25) + 19 * (x8 * x8) + 2 * ((x0 * x6) +
-                                              (x2 * x4) + (x3 * x3)) + 4 * (x1 * x5) +
+                                                  (x2 * x4) + (x3 * x3)) + 4 * (x1 * x5) +
                 76 * (x7 * x9);
             xsqr.N6 = (t & ((1 << 26) - 1));
             t = (t >> 26) + 2 * ((x0 * x7) + (x1 * x6) + (x2 * x5) +
-                               (x3 * x4)) + 38 * (x8 * x9);
+                                 (x3 * x4)) + 38 * (x8 * x9);
             xsqr.N7 = (t & ((1 << 25) - 1));
             t = (t >> 25) + xsqr.N8;
             xsqr.N8 = (t & ((1 << 26) - 1));
@@ -831,9 +832,9 @@ namespace Elliptic
             Copy(x[1], dx);
             Set(z[1], 1);
 
-            for (var i = 32; i-- != 0; )
+            for (var i = 32; i-- != 0;)
             {
-                for (var j = 8; j-- != 0; )
+                for (var j = 8; j-- != 0;)
                 {
                     /* swap arguments depending on bit */
                     var bit1 = (privateKey[i] & 0xFF) >> j & 1;
@@ -912,6 +913,6 @@ namespace Elliptic
         private static readonly Long10 BaseR2Y = new Long10(
             5744, 8160848, 4790893, 13779497, 35730846,
             12541209, 49101323, 30047407, 40071253, 6226132
-            );
+        );
     }
 }

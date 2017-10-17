@@ -1,5 +1,0 @@
-E:\Git\curve25519\Curve25519\bin\Debug\Curve25519.dll
-E:\Git\curve25519\Curve25519\bin\Debug\Curve25519.pdb
-E:\Git\curve25519\Curve25519\obj\Debug\Curve25519.csproj.CoreCompileInputs.cache
-E:\Git\curve25519\Curve25519\obj\Debug\Curve25519.dll
-E:\Git\curve25519\Curve25519\obj\Debug\Curve25519.pdb
