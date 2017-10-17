@@ -1,5 +1,6 @@
-﻿/* Ported parts from Java to C# and refactored by Hans Wolff, 17/09/2013 */
-/* Ported to .NET Framework 4.7, .NET Standard and refactored by Felipe Muniz, 17/10/2017 */
+﻿/* Ported to .NET Standard and refactored by Felipe Muniz (Mun1z), 17/10/2017 */
+
+/* Ported parts from Java to C# and refactored by Hans Wolff, 17/09/2013 */
 
 /* Ported from C to Java by Dmitry Skiba [sahn0], 23/02/08.
  * Original: http://code.google.com/p/curve25519-java/

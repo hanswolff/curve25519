@@ -1,6 +1,9 @@
 [Curve25519](http://cr.yp.to/ecdh.html) is an elliptic curve, 
 developed by [Dan Bernstein](http://cr.yp.to/djb.html), for fast Diffie-Hellman key agreement.
 
+Ported to .NET Standard and refactored by Felipe Muniz (Mun1z), 17/10/2017
+Fork: https://github.com/mun1z/curve25519/
+
 Ported parts from Java to C# and refactored by Hans Wolff, 17/09/2013.  
 Original: https://github.com/hanswolff/curve25519/
 
