@@ -20,14 +20,14 @@ Original: http://cds.xs4all.nl:8081/ecdh/ (broken link)
 
 	// what Alice does
 	byte[] aliceRandomBytes = new byte[32];
-	RNGCryptoServiceProvider.Create().GetBytes(aliceRandomBytes);
+	RandomNumberGenerator.Create().GetBytes(aliceRandomBytes);
 
 	byte[] alicePrivate = Curve25519.ClampPrivateKey(aliceRandomBytes);
 	byte[] alicePublic = Curve25519.GetPublicKey(alicePrivate);
 
 	// what Bob does
 	byte[] bobRandomBytes = new byte[32];
-	RNGCryptoServiceProvider.Create().GetBytes(bobRandomBytes);
+	RandomNumberGenerator.Create().GetBytes(bobRandomBytes);
 
 	byte[] bobPrivate = Curve25519.ClampPrivateKey(bobRandomBytes);
 	byte[] bobPublic = Curve25519.GetPublicKey(bobPrivate);
