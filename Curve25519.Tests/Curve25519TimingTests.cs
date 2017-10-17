@@ -11,27 +11,27 @@ namespace Elliptic.Tests
         [Test]
         public void Curve25519_GetPublicKey()
         {
-            List<long> ticks = new List<long>();
-            for (int i = 0; i < 255; i++)
+            var ticks = new List<long>();
+            for (var i = 0; i < 255; i++)
             {
-                Stopwatch stopwatch = Stopwatch.StartNew();
+                var stopwatch = Stopwatch.StartNew();
 
-                byte[] privateKey = Curve25519.ClampPrivateKey(TestHelpers.GetUniformBytes((byte)i, 32));
+                var privateKey = Curve25519.ClampPrivateKey(TestHelpers.GetUniformBytes((byte)i, 32));
 
-                for (int j = 0; j < 1000; j++)
+                for (var j = 0; j < 1000; j++)
                 {
-                    byte[] publicKey = Curve25519.GetPublicKey(privateKey);
+                    var publicKey = Curve25519.GetPublicKey(privateKey);
                 }
 
                 ticks.Add(stopwatch.ElapsedMilliseconds);
             }
 
-            long min = long.MaxValue;
-            long max = long.MinValue;
-            for (int i = 0; i < ticks.Count; i++)
+            var min = long.MaxValue;
+            var max = long.MinValue;
+            foreach (var t in ticks)
             {
-                if (ticks[i] < min) min = ticks[i];
-                if (ticks[i] > max) max = ticks[i];
+                if (t < min) min = t;
+                if (t > max) max = t;
             }
 
             Assert.Inconclusive("Min: {0}, Max: {1}", min, max);

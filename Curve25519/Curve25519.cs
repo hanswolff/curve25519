@@ -22,7 +22,7 @@ namespace Elliptic
         public const int KeySize = 32;
 
         /* group order (a prime near 2^252+2^124) */
-        static readonly byte[] Order =
+        private static readonly byte[] Order =
         {
             237, 211, 245, 92,
             26, 99, 18, 88,
@@ -42,8 +42,9 @@ namespace Elliptic
         /// <param name="key">[out] 32 random bytes</param>
         public static void ClampPrivateKeyInline(byte[] key)
         {
-            if (key == null) throw new ArgumentNullException("key");
-            if (key.Length != 32) throw new ArgumentException(String.Format("key must be 32 bytes long (but was {0} bytes long)", key.Length));
+            if (key == null) throw new ArgumentNullException(nameof(key));
+            if (key.Length != 32) throw new ArgumentException(
+                $"key must be 32 bytes long (but was {key.Length} bytes long)");
 
             key[31] &= 0x7F;
             key[31] |= 0x40;
@@ -56,8 +57,9 @@ namespace Elliptic
         /// <param name="rawKey">[out] 32 random bytes</param>
         public static byte[] ClampPrivateKey(byte[] rawKey)
         {
-            if (rawKey == null) throw new ArgumentNullException("rawKey");
-            if (rawKey.Length != 32) throw new ArgumentException(String.Format("rawKey must be 32 bytes long (but was {0} bytes long)", rawKey.Length), "rawKey");
+            if (rawKey == null) throw new ArgumentNullException(nameof(rawKey));
+            if (rawKey.Length != 32) throw new ArgumentException(
+                $"rawKey must be 32 bytes long (but was {rawKey.Length} bytes long)", nameof(rawKey));
 
             var res = new byte[32];
             Array.Copy(rawKey, res, 32);
@@ -76,7 +78,7 @@ namespace Elliptic
         public static byte[] CreateRandomPrivateKey()
         {
             var privateKey = new byte[32];
-            RNGCryptoServiceProvider.Create().GetBytes(privateKey);
+            RandomNumberGenerator.Create().GetBytes(privateKey);
             ClampPrivateKeyInline(privateKey);
 
             return privateKey;
@@ -91,16 +93,19 @@ namespace Elliptic
         /// <remarks>WARNING: if signingKey is not NULL, this function has data-dependent timing</remarks>
         public static void KeyGenInline(byte[] publicKey, byte[] signingKey, byte[] privateKey)
         {
-            if (publicKey == null) throw new ArgumentNullException("publicKey");
-            if (publicKey.Length != 32) throw new ArgumentException(String.Format("publicKey must be 32 bytes long (but was {0} bytes long)", publicKey.Length), "publicKey");
+            if (publicKey == null) throw new ArgumentNullException(nameof(publicKey));
+            if (publicKey.Length != 32) throw new ArgumentException(
+                $"publicKey must be 32 bytes long (but was {publicKey.Length} bytes long)", nameof(publicKey));
 
-            if (signingKey == null) throw new ArgumentNullException("signingKey");
-            if (signingKey.Length != 32) throw new ArgumentException(String.Format("signingKey must be 32 bytes long (but was {0} bytes long)", signingKey.Length), "signingKey");
+            if (signingKey == null) throw new ArgumentNullException(nameof(signingKey));
+            if (signingKey.Length != 32) throw new ArgumentException(
+                $"signingKey must be 32 bytes long (but was {signingKey.Length} bytes long)", nameof(signingKey));
 
-            if (privateKey == null) throw new ArgumentNullException("privateKey");
-            if (privateKey.Length != 32) throw new ArgumentException(String.Format("privateKey must be 32 bytes long (but was {0} bytes long)", privateKey.Length), "privateKey");
+            if (privateKey == null) throw new ArgumentNullException(nameof(privateKey));
+            if (privateKey.Length != 32) throw new ArgumentException(
+                $"privateKey must be 32 bytes long (but was {privateKey.Length} bytes long)", nameof(privateKey));
 
-            RNGCryptoServiceProvider.Create().GetBytes(privateKey);
+            RandomNumberGenerator.Create().GetBytes(privateKey);
             ClampPrivateKeyInline(privateKey);
 
             Core(publicKey, signingKey, privateKey, null);
@@ -149,7 +154,6 @@ namespace Elliptic
 
         /* sahn0:
          * Using this class instead of long[10] to avoid bounds checks. */
-
         private sealed class Long10
         {
             public Long10()
@@ -177,7 +181,7 @@ namespace Elliptic
 
         /********************* radix 2^8 math *********************/
 
-        static void Copy32(byte[] source, byte[] destination)
+        private static void Copy32(byte[] source, byte[] destination)
         {
             Array.Copy(source, 0, destination, 0, 32);
         }
@@ -185,11 +189,10 @@ namespace Elliptic
         /* p[m..n+m-1] = q[m..n+m-1] + z * x */
         /* n is the size of x */
         /* n+m is the size of p and q */
-
-        static int MultiplyArraySmall(byte[] p, byte[] q, int m, byte[] x, int n, int z)
+        private static int MultiplyArraySmall(byte[] p, byte[] q, int m, byte[] x, int n, int z)
         {
-            int v = 0;
-            for (int i = 0; i < n; ++i)
+            var v = 0;
+            for (var i = 0; i < n; ++i)
             {
                 v += (q[i + m] & 0xFF) + z * (x[i] & 0xFF);
                 p[i + m] = (byte)v;
@@ -201,15 +204,14 @@ namespace Elliptic
         /* p += x * y * z  where z is a small integer
          * x is size 32, y is size t, p is size 32+t
          * y is allowed to overlap with p+32 if you don't care about the upper half  */
-
-        static void MultiplyArray32(byte[] p, byte[] x, byte[] y, int t, int z)
+        private static void MultiplyArray32(byte[] p, byte[] x, byte[] y, int t, int z)
         {
             const int n = 31;
-            int w = 0;
-            int i = 0;
+            var w = 0;
+            var i = 0;
             for (; i < t; i++)
             {
-                int zy = z * (y[i] & 0xFF);
+                var zy = z * (y[i] & 0xFF);
                 w += MultiplyArraySmall(p, p, i, x, n, zy) +
                      (p[i + n] & 0xFF) + zy * (x[n] & 0xFF);
                 p[i + n] = (byte)w;
@@ -223,17 +225,17 @@ namespace Elliptic
          * requires t > 0 && d[t-1] != 0
          * requires that r[-1] and d[-1] are valid memory locations
          * q may overlap with r+t */
-        static void DivMod(byte[] q, byte[] r, int n, byte[] d, int t)
+        private static void DivMod(byte[] q, byte[] r, int n, byte[] d, int t)
         {
-            int rn = 0;
-            int dt = ((d[t - 1] & 0xFF) << 8);
+            var rn = 0;
+            var dt = ((d[t - 1] & 0xFF) << 8);
             if (t > 1)
             {
                 dt |= (d[t - 2] & 0xFF);
             }
             while (n-- >= t)
             {
-                int z = (rn << 16) | ((r[n] & 0xFF) << 8);
+                var z = (rn << 16) | ((r[n] & 0xFF) << 8);
                 if (n > 0)
                 {
                     z |= (r[n - 1] & 0xFF);
@@ -248,9 +250,9 @@ namespace Elliptic
             r[t - 1] = (byte)rn;
         }
 
-        static int GetNumSize(byte[] num, int maxSize)
+        private static int GetNumSize(byte[] num, int maxSize)
         {
-            for (int i = maxSize; i >= 0; i++)
+            for (var i = maxSize; i >= 0; i++)
             {
                 if (num[i] == 0) return i + 1;
             }
@@ -265,20 +267,20 @@ namespace Elliptic
         /// <param name="a">requires that a[-1] and b[-1] are valid memory locations</param>
         /// <param name="b">requires that a[-1] and b[-1] are valid memory locations</param>
         /// <returns>Also, the returned buffer contains the inverse of a mod b as 32-byte signed.</returns>
-        static byte[] Egcd32(byte[] x, byte[] y, byte[] a, byte[] b)
+        private static byte[] Egcd32(byte[] x, byte[] y, byte[] a, byte[] b)
         {
-            int bn = 32;
+            var bn = 32;
             int i;
             for (i = 0; i < 32; i++)
                 x[i] = y[i] = 0;
             x[0] = 1;
-            int an = GetNumSize(a, 32);
+            var an = GetNumSize(a, 32);
             if (an == 0)
                 return y; /* division by zero */
             var temp = new byte[32];
             while (true)
             {
-                int qn = bn - an + 1;
+                var qn = bn - an + 1;
                 DivMod(temp, b, bn, a, an);
                 bn = GetNumSize(b, bn);
                 if (bn == 0)
@@ -301,7 +303,7 @@ namespace Elliptic
 
         /* Convert to internal format from little-endian byte format */
 
-        static void Unpack(Long10 x, byte[] m)
+        private static void Unpack(Long10 x, byte[] m)
         {
             x.N0 = ((m[0] & 0xFF)) | ((m[1] & 0xFF)) << 8 |
                    (m[2] & 0xFF) << 16 | ((m[3] & 0xFF) & 3) << 24;
@@ -328,7 +330,7 @@ namespace Elliptic
         /// <summary>
         /// Check if reduced-form input >= 2^255-19
         /// </summary>
-        static bool IsOverflow(Long10 x)
+        private static bool IsOverflow(Long10 x)
         {
             return (
                 ((x.N0 > P26 - 19)) &
@@ -342,13 +344,12 @@ namespace Elliptic
          *     unpack, mul, sqr
          *     set --  if input in range 0 .. P25
          * If you're unsure if the number is reduced, first multiply it by 1.  */
-
-        static void Pack(Long10 x, byte[] m)
+        private static void Pack(Long10 x, byte[] m)
         {
-            int ld = (IsOverflow(x) ? 1 : 0) - ((x.N9 < 0) ? 1 : 0);
-            int ud = ld * -(P25 + 1);
+            var ld = (IsOverflow(x) ? 1 : 0) - ((x.N9 < 0) ? 1 : 0);
+            var ud = ld * -(P25 + 1);
             ld *= 19;
-            long t = ld + x.N0 + (x.N1 << 26);
+            var t = ld + x.N0 + (x.N1 << 26);
             m[0] = (byte)t;
             m[1] = (byte)(t >> 8);
             m[2] = (byte)(t >> 16);
@@ -393,7 +394,7 @@ namespace Elliptic
         /// <summary>
         /// Copy a number
         /// </summary>
-        static void Copy(Long10 numOut, Long10 numIn)
+        private static void Copy(Long10 numOut, Long10 numIn)
         {
             numOut.N0 = numIn.N0;
             numOut.N1 = numIn.N1;
@@ -410,7 +411,7 @@ namespace Elliptic
         /// <summary>
         /// Set a number to value, which must be in range -185861411 .. 185861411
         /// </summary>
-        static void Set(Long10 numOut, int numIn)
+        private static void Set(Long10 numOut, int numIn)
         {
             numOut.N0 = numIn;
             numOut.N1 = 0;
@@ -427,7 +428,7 @@ namespace Elliptic
         /* Add/subtract two numbers.  The inputs must be in reduced form, and the 
          * output isn't, so to do another addition or subtraction on the output, 
          * first multiply it by one to reduce it. */
-        static void Add(Long10 xy, Long10 x, Long10 y)
+        private static void Add(Long10 xy, Long10 x, Long10 y)
         {
             xy.N0 = x.N0 + y.N0;
             xy.N1 = x.N1 + y.N1;
@@ -441,7 +442,7 @@ namespace Elliptic
             xy.N9 = x.N9 + y.N9;
         }
 
-        static void Sub(Long10 xy, Long10 x, Long10 y)
+        private static void Sub(Long10 xy, Long10 x, Long10 y)
         {
             xy.N0 = x.N0 - y.N0;
             xy.N1 = x.N1 - y.N1;
@@ -460,9 +461,9 @@ namespace Elliptic
         /// The output is in reduced form, the input x need not be.  x and xy may point
         /// to the same buffer.
         /// </summary>
-        static void MulSmall(Long10 xy, Long10 x, long y)
+        private static void MulSmall(Long10 xy, Long10 x, long y)
         {
-            long temp = (x.N8 * y);
+            var temp = (x.N8 * y);
             xy.N8 = (temp & ((1 << 26) - 1));
             temp = (temp >> 26) + (x.N9 * y);
             xy.N9 = (temp & ((1 << 25) - 1));
@@ -490,7 +491,7 @@ namespace Elliptic
         /// <summary>
         /// Multiply two numbers. The output is in reduced form, the inputs need not be.
         /// </summary>
-        static void Multiply(Long10 xy, Long10 x, Long10 y)
+        private static void Multiply(Long10 xy, Long10 x, Long10 y)
         {
             /* sahn0:
              * Using local variables to avoid class access.
@@ -518,7 +519,7 @@ namespace Elliptic
                 y7 = y.N7,
                 y8 = y.N8,
                 y9 = y.N9;
-            long
+            var
                 t = (x0*y8) + (x2*y6) + (x4*y4) + (x6*y2) +
                     (x8*y0) + 2*((x1*y7) + (x3*y5) +
                                  (x5*y3) + (x7*y1)) + 38*
@@ -577,7 +578,7 @@ namespace Elliptic
         /// <summary>
         /// Square a number.  Optimization of  Multiply(x2, x, x)
         /// </summary>
-        static void Square(Long10 xsqr, Long10 x)
+        private static void Square(Long10 xsqr, Long10 x)
         {
             long
                 x0 = x.N0,
@@ -591,7 +592,7 @@ namespace Elliptic
                 x8 = x.N8,
                 x9 = x.N9;
 
-            long t = (x4 * x4) + 2 * ((x0 * x8) + (x2 * x6)) + 38 *
+            var t = (x4 * x4) + 2 * ((x0 * x8) + (x2 * x6)) + 38 *
                      (x9 * x9) + 4 * ((x1 * x7) + (x3 * x5));
 
             xsqr.N8 = (t & ((1 << 26) - 1));
@@ -636,7 +637,7 @@ namespace Elliptic
         /// be.  Simply calculates  y = x^(p-2)  so it's not too fast. */
         /// When sqrtassist is true, it instead calculates y = x^((p-5)/8)
         /// </summary>
-        static void Reciprocal(Long10 y, Long10 x, bool sqrtAssist)
+        private static void Reciprocal(Long10 y, Long10 x, bool sqrtAssist)
         {
             Long10
                 t0 = new Long10(),
@@ -723,7 +724,7 @@ namespace Elliptic
         /// Checks if x is "negative", requires reduced input
         /// </summary>
         /// <param name="x">must be reduced input</param>
-        static int IsNegative(Long10 x)
+        private static int IsNegative(Long10 x)
         {
             return (int)(((IsOverflow(x) | (x.N9 < 0)) ? 1 : 0) ^ (x.N0 & 1));
         }
@@ -734,8 +735,7 @@ namespace Elliptic
 
         /* t1 = ax + az
          * t2 = ax - az  */
-
-        static void MontyPrepare(Long10 t1, Long10 t2, Long10 ax, Long10 az)
+        private static void MontyPrepare(Long10 t1, Long10 t2, Long10 ax, Long10 az)
         {
             Add(t1, ax, az);
             Sub(t2, ax, az);
@@ -747,8 +747,7 @@ namespace Elliptic
          *  X(Q) = (t3+t4)/(t3-t4)
          *  X(P-Q) = dx
          * clobbers t1 and t2, preserves t3 and t4  */
-
-        static void MontyAdd(Long10 t1, Long10 t2, Long10 t3, Long10 t4, Long10 ax, Long10 az, Long10 dx)
+        private static void MontyAdd(Long10 t1, Long10 t2, Long10 t3, Long10 t4, Long10 ax, Long10 az, Long10 dx)
         {
             Multiply(ax, t2, t3);
             Multiply(az, t1, t4);
@@ -763,8 +762,7 @@ namespace Elliptic
          *  X(B) = bx/bz
          *  X(Q) = (t3+t4)/(t3-t4)
          * clobbers t1 and t2, preserves t3 and t4  */
-
-        static void MontyDouble(Long10 t1, Long10 t2, Long10 t3, Long10 t4, Long10 bx, Long10 bz)
+        private static void MontyDouble(Long10 t1, Long10 t2, Long10 t3, Long10 t4, Long10 bx, Long10 bz)
         {
             Square(t1, t3);
             Square(t2, t4);
@@ -781,7 +779,7 @@ namespace Elliptic
         /// <param name="y2">output</param>
         /// <param name="x">X</param>
         /// <param name="temp">temporary</param>
-        static void CurveEquationInline(Long10 y2, Long10 x, Long10 temp)
+        private static void CurveEquationInline(Long10 y2, Long10 x, Long10 temp)
         {
             Square(temp, x);
             MulSmall(y2, x, 486662);
@@ -793,17 +791,21 @@ namespace Elliptic
         /// <summary>
         /// P = kG   and  s = sign(P)/k
         /// </summary>
-        static void Core(byte[] publicKey, byte[] signingKey, byte[] privateKey, byte[] peerPublicKey)
+        private static void Core(byte[] publicKey, byte[] signingKey, byte[] privateKey, byte[] peerPublicKey)
         {
-            if (publicKey == null) throw new ArgumentNullException("publicKey");
-            if (publicKey.Length != 32) throw new ArgumentException(String.Format("publicKey must be 32 bytes long (but was {0} bytes long)", publicKey.Length), "publicKey");
+            if (publicKey == null) throw new ArgumentNullException(nameof(publicKey));
+            if (publicKey.Length != 32) throw new ArgumentException(
+                $"publicKey must be 32 bytes long (but was {publicKey.Length} bytes long)", nameof(publicKey));
 
-            if (signingKey != null && signingKey.Length != 32) throw new ArgumentException(String.Format("signingKey must be null or 32 bytes long (but was {0} bytes long)", signingKey.Length), "signingKey");
+            if (signingKey != null && signingKey.Length != 32) throw new ArgumentException(
+                $"signingKey must be null or 32 bytes long (but was {signingKey.Length} bytes long)", nameof(signingKey));
 
-            if (privateKey == null) throw new ArgumentNullException("privateKey");
-            if (privateKey.Length != 32) throw new ArgumentException(String.Format("privateKey must be 32 bytes long (but was {0} bytes long)", privateKey.Length), "privateKey");
+            if (privateKey == null) throw new ArgumentNullException(nameof(privateKey));
+            if (privateKey.Length != 32) throw new ArgumentException(
+                $"privateKey must be 32 bytes long (but was {privateKey.Length} bytes long)", nameof(privateKey));
 
-            if (peerPublicKey != null && peerPublicKey.Length != 32) throw new ArgumentException(String.Format("peerPublicKey must be null or 32 bytes long (but was {0} bytes long)", peerPublicKey.Length), "peerPublicKey");
+            if (peerPublicKey != null && peerPublicKey.Length != 32) throw new ArgumentException(
+                $"peerPublicKey must be null or 32 bytes long (but was {peerPublicKey.Length} bytes long)", nameof(peerPublicKey));
 
             Long10
                 dx = new Long10(),
@@ -829,17 +831,17 @@ namespace Elliptic
             Copy(x[1], dx);
             Set(z[1], 1);
 
-            for (int i = 32; i-- != 0; )
+            for (var i = 32; i-- != 0; )
             {
-                for (int j = 8; j-- != 0; )
+                for (var j = 8; j-- != 0; )
                 {
                     /* swap arguments depending on bit */
-                    int bit1 = (privateKey[i] & 0xFF) >> j & 1;
-                    int bit0 = ~(privateKey[i] & 0xFF) >> j & 1;
-                    Long10 ax = x[bit0];
-                    Long10 az = z[bit0];
-                    Long10 bx = x[bit1];
-                    Long10 bz = z[bit1];
+                    var bit1 = (privateKey[i] & 0xFF) >> j & 1;
+                    var bit0 = ~(privateKey[i] & 0xFF) >> j & 1;
+                    var ax = x[bit0];
+                    var az = z[bit0];
+                    var bx = x[bit1];
+                    var bz = z[bit1];
 
                     /* a' = a + b	*/
                     /* b' = 2 b	*/
@@ -855,43 +857,44 @@ namespace Elliptic
             Pack(dx, publicKey);
 
             /* calculate s such that s abs(P) = G  .. assumes G is std base point */
-            if (signingKey != null)
-            {
-                CurveEquationInline(t1, dx, t2); /* t1 = Py^2  */
-                Reciprocal(t3, z[1], false); /* where Q=P+G ... */
-                Multiply(t2, x[1], t3); /* t2 = Qx  */
-                Add(t2, t2, dx); /* t2 = Qx + Px  */
-                t2.N0 += 9 + 486662; /* t2 = Qx + Px + Gx + 486662  */
-                dx.N0 -= 9; /* dx = Px - Gx  */
-                Square(t3, dx); /* t3 = (Px - Gx)^2  */
-                Multiply(dx, t2, t3); /* dx = t2 (Px - Gx)^2  */
-                Sub(dx, dx, t1); /* dx = t2 (Px - Gx)^2 - Py^2  */
-                dx.N0 -= 39420360; /* dx = t2 (Px - Gx)^2 - Py^2 - Gy^2  */
-                Multiply(t1, dx, BaseR2Y); /* t1 = -Py  */
-                if (IsNegative(t1) != 0) /* sign is 1, so just copy  */
-                    Copy32(privateKey, signingKey);
-                else /* sign is -1, so negate  */
-                    MultiplyArraySmall(signingKey, OrderTimes8, 0, privateKey, 32, -1);
+            if (signingKey == null) return;
 
-                /* reduce s mod q
+            CurveEquationInline(t1, dx, t2); /* t1 = Py^2  */
+            Reciprocal(t3, z[1], false); /* where Q=P+G ... */
+            Multiply(t2, x[1], t3); /* t2 = Qx  */
+            Add(t2, t2, dx); /* t2 = Qx + Px  */
+            t2.N0 += 9 + 486662; /* t2 = Qx + Px + Gx + 486662  */
+            dx.N0 -= 9; /* dx = Px - Gx  */
+            Square(t3, dx); /* t3 = (Px - Gx)^2  */
+            Multiply(dx, t2, t3); /* dx = t2 (Px - Gx)^2  */
+            Sub(dx, dx, t1); /* dx = t2 (Px - Gx)^2 - Py^2  */
+            dx.N0 -= 39420360; /* dx = t2 (Px - Gx)^2 - Py^2 - Gy^2  */
+            Multiply(t1, dx, BaseR2Y); /* t1 = -Py  */
+
+            if (IsNegative(t1) != 0) /* sign is 1, so just copy  */
+                Copy32(privateKey, signingKey);
+
+            else /* sign is -1, so negate  */
+                MultiplyArraySmall(signingKey, OrderTimes8, 0, privateKey, 32, -1);
+
+            /* reduce s mod q
                  * (is this needed?  do it just in case, it's fast anyway) */
-                //divmod((dstptr) t1, s, 32, order25519, 32);
+            //divmod((dstptr) t1, s, 32, order25519, 32);
 
-                /* take reciprocal of s mod q */
-                var temp1 = new byte[32];
-                var temp2 = new byte[64];
-                var temp3 = new byte[64];
-                Copy32(Order, temp1);
-                Copy32(Egcd32(temp2, temp3, signingKey, temp1), signingKey);
-                if ((signingKey[31] & 0x80) != 0)
-                    MultiplyArraySmall(signingKey, signingKey, 0, Order, 32, 1);
-            }
+            /* take reciprocal of s mod q */
+            var temp1 = new byte[32];
+            var temp2 = new byte[64];
+            var temp3 = new byte[64];
+            Copy32(Order, temp1);
+            Copy32(Egcd32(temp2, temp3, signingKey, temp1), signingKey);
+            if ((signingKey[31] & 0x80) != 0)
+                MultiplyArraySmall(signingKey, signingKey, 0, Order, 32, 1);
         }
 
         /// <summary>
         /// Smallest multiple of the order that's >= 2^255
         /// </summary>
-        static readonly byte[] OrderTimes8 =
+        private static readonly byte[] OrderTimes8 =
         {
             104, 159, 174, 231,
             210, 24, 147, 192,
@@ -906,7 +909,7 @@ namespace Elliptic
         /// <summary>
         /// Constant 1/(2Gy)
         /// </summary>
-        static readonly Long10 BaseR2Y = new Long10(
+        private static readonly Long10 BaseR2Y = new Long10(
             5744, 8160848, 4790893, 13779497, 35730846,
             12541209, 49101323, 30047407, 40071253, 6226132
             );
