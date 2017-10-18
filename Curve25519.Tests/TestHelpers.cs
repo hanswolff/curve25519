@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections;
 
-namespace Elliptic.Tests
+namespace Curve25519.Tests
 {
     public static class TestHelpers
     {
         public static Random CreateSemiRandomGenerator()
         {
-            DateTime now = DateTime.Now;
+            var now = DateTime.Now;
             return new Random(now.DayOfYear * 365 + now.Hour);
         }
 
         public static byte[] GetRandomBytes(Random random, int size)
         {
-            byte[] result = new byte[size];
-            for (int i = 0; i < size; i++)
+            var result = new byte[size];
+            for (var i = 0; i < size; i++)
             {
                 result[i] = (byte)random.Next(256);
             }
@@ -23,8 +23,8 @@ namespace Elliptic.Tests
 
         public static byte[] GetUniformBytes(byte value, int size)
         {
-            byte[] result = new byte[size];
-            for (int i = 0; i < size; i++)
+            var result = new byte[size];
+            for (var i = 0; i < size; i++)
             {
                 result[i] = value;
             }
