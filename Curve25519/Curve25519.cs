@@ -250,7 +250,7 @@ namespace Elliptic
 
         static int GetNumSize(byte[] num, int maxSize)
         {
-            for (int i = maxSize; i >= 0; i++)
+            for (int i = maxSize; i >= 0; i--)
             {
                 if (num[i] == 0) return i + 1;
             }
